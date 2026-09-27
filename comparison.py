@@ -1,10 +1,12 @@
 
-def compare_papers(meta1, meta2,
-                   domain1, domain2,
-                   extractive1, extractive2,
-                   abstractive1, abstractive2,
-                   keywords1, keywords2,
-                   stats1, stats2):
+def compare_papers(
+    meta1, meta2,
+    domain1, domain2,
+    extractive1, extractive2,
+    abstractive1, abstractive2,
+    keywords1, keywords2,
+    stats1, stats2
+):
 
     return {
         "Paper A": {
