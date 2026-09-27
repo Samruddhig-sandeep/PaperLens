@@ -442,6 +442,11 @@ Rewrites the paper into simpler language.
 # COMPARE TWO PAPERS
 # ---------------------------------------------------
 
+
+# ---------------------------------------------------
+# COMPARE TWO PAPERS
+# ---------------------------------------------------
+
 else:
 
     if uploaded_file and second_file:
@@ -458,7 +463,8 @@ else:
 
             domain, conf = predict_domain(clean)
 
-            summary = generate_summary(text)
+            # Only Gemini summary for comparison
+            abstractive = generate_smart_summary(text)
 
             keywords = extract_keywords(clean)
 
@@ -468,7 +474,7 @@ else:
                 "meta": meta,
                 "domain": domain,
                 "confidence": conf,
-                "summary": summary,
+                "abstractive": abstractive,
                 "keywords": keywords,
                 "stats": stats
             }
@@ -476,16 +482,15 @@ else:
         with st.spinner("Comparing papers..."):
 
             paper1 = process(uploaded_file)
-
             paper2 = process(second_file)
 
-            compare_papers(
+            result = compare_papers(
                 paper1["meta"],
                 paper2["meta"],
                 paper1["domain"],
                 paper2["domain"],
-                paper1["summary"],
-                paper2["summary"],
+                paper1["abstractive"],
+                paper2["abstractive"],
                 paper1["keywords"],
                 paper2["keywords"],
                 paper1["stats"],
@@ -501,20 +506,25 @@ else:
 
 ## 📘 Paper A
 
-**{paper1["meta"]["title"]}**
+**{result["Paper A"]["Title"]}**
 
-📅 {paper1["meta"]["year"]}
+📅 {result["Paper A"]["Year"]}
 
-🏷️ {paper1["domain"]}
+🏷️ {result["Paper A"]["Domain"]}
 
-📖 {paper1["stats"]["Reading Time"]} min
+📖 {result["Paper A"]["Reading Time"]} min
 
-🔑 {", ".join([k for k,_ in paper1["keywords"][:5]])}
+🔑 {result["Paper A"]["Keywords"]}
 
 </div>
 """, unsafe_allow_html=True)
 
-            st.write(paper1["summary"])
+            st.markdown("### ✨ Abstractive Summary (Gemini)")
+
+            if result["Paper A"]["Summary"]:
+                st.write(result["Paper A"]["Summary"])
+            else:
+                st.warning("Gemini summary is temporarily unavailable.")
 
         with c2:
 
@@ -523,22 +533,29 @@ else:
 
 ## 📙 Paper B
 
-**{paper2["meta"]["title"]}**
+**{result["Paper B"]["Title"]}**
 
-📅 {paper2["meta"]["year"]}
+📅 {result["Paper B"]["Year"]}
 
-🏷️ {paper2["domain"]}
+🏷️ {result["Paper B"]["Domain"]}
 
-📖 {paper2["stats"]["Reading Time"]} min
+📖 {result["Paper B"]["Reading Time"]} min
 
-🔑 {", ".join([k for k,_ in paper2["keywords"][:5]])}
+🔑 {result["Paper B"]["Keywords"]}
 
 </div>
 """, unsafe_allow_html=True)
 
-            st.write(paper2["summary"])
+            st.markdown("### ✨ Abstractive Summary (Gemini)")
 
-        st.subheader("Quick Comparison")
+            if result["Paper B"]["Summary"]:
+                st.write(result["Paper B"]["Summary"])
+            else:
+                st.warning("Gemini summary is temporarily unavailable.")
+
+        st.markdown("---")
+
+        st.subheader("📊 Quick Comparison")
 
         st.table({
             "Feature": [
@@ -548,16 +565,16 @@ else:
                 "Reading Time"
             ],
             "Paper A": [
-                paper1["domain"],
-                paper1["meta"]["year"],
-                paper1["stats"]["Words"],
-                paper1["stats"]["Reading Time"]
+                result["Paper A"]["Domain"],
+                result["Paper A"]["Year"],
+                result["Paper A"]["Words"],
+                result["Paper A"]["Reading Time"]
             ],
             "Paper B": [
-                paper2["domain"],
-                paper2["meta"]["year"],
-                paper2["stats"]["Words"],
-                paper2["stats"]["Reading Time"]
+                result["Paper B"]["Domain"],
+                result["Paper B"]["Year"],
+                result["Paper B"]["Words"],
+                result["Paper B"]["Reading Time"]
             ]
         })
 

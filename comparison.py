@@ -1,6 +1,6 @@
 
 def compare_papers(meta1, meta2, domain1, domain2,
-                   summary1, summary2,
+                   abstractive1, abstractive2,
                    keywords1, keywords2,
                    stats1, stats2):
 
@@ -12,7 +12,7 @@ def compare_papers(meta1, meta2, domain1, domain2,
             "Words": stats1["Words"],
             "Reading Time": stats1["Reading Time"],
             "Keywords": ", ".join([k for k, _ in keywords1[:5]]),
-            "Summary": summary1[:400]
+            "Summary": abstractive1
         },
         "Paper B": {
             "Title": meta2["title"],
@@ -21,6 +21,6 @@ def compare_papers(meta1, meta2, domain1, domain2,
             "Words": stats2["Words"],
             "Reading Time": stats2["Reading Time"],
             "Keywords": ", ".join([k for k, _ in keywords2[:5]]),
-            "Summary": summary2[:400]
+            "Summary": abstractive2
         }
     }
