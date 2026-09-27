@@ -1,21 +1,29 @@
 
 import pandas as pd
+import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-df = pd.read_csv("training_data.csv")
+@st.cache_resource
+def load_domain_model():
 
-vectorizer = TfidfVectorizer(
-    stop_words="english",
-    lowercase=True,
-    ngram_range=(1,2),
-    max_features=3000
-)
+    df = pd.read_csv("training_data.csv")
 
-X = vectorizer.fit_transform(df["text"])
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        lowercase=True,
+        ngram_range=(1,2),
+        max_features=3000
+    )
 
-model = MultinomialNB()
-model.fit(X, df["label"])
+    X = vectorizer.fit_transform(df["text"])
+
+    model = MultinomialNB()
+    model.fit(X, df["label"])
+
+    return vectorizer, model
+
+vectorizer, model = load_domain_model()
 
 def predict_domain(text):
 
@@ -23,6 +31,6 @@ def predict_domain(text):
 
     label = model.predict(vec)[0]
 
-    confidence = model.predict_proba(vec).max()*100
+    confidence = model.predict_proba(vec).max() * 100
 
     return label, round(confidence,1)
