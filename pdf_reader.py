@@ -2,6 +2,8 @@
 import fitz
 import re
 
+
+@st.cache_data
 def extract_text_from_pdf(uploaded_file):
     uploaded_file.seek(0)
     doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
@@ -14,6 +16,8 @@ def extract_text_from_pdf(uploaded_file):
     return text
 
 
+
+@st.cache_data
 def extract_paper_metadata(uploaded_file):
     uploaded_file.seek(0)
 

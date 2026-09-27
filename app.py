@@ -443,6 +443,7 @@ Rewrites the paper into simpler language.
 # ---------------------------------------------------
 
 
+
 # ---------------------------------------------------
 # COMPARE TWO PAPERS
 # ---------------------------------------------------
@@ -456,24 +457,23 @@ else:
         def process(file):
 
             text = extract_text_from_pdf(file)
-
             meta = extract_paper_metadata(file)
-
             clean, tok = preprocess_text(text)
 
             domain, conf = predict_domain(clean)
 
-            # Only Gemini summary for comparison
+            # Generate BOTH summaries
+            extractive = generate_summary(text)
             abstractive = generate_smart_summary(text)
 
             keywords = extract_keywords(clean)
-
             stats = get_stats(text, tok)
 
             return {
                 "meta": meta,
                 "domain": domain,
                 "confidence": conf,
+                "extractive": extractive,
                 "abstractive": abstractive,
                 "keywords": keywords,
                 "stats": stats
@@ -489,6 +489,8 @@ else:
                 paper2["meta"],
                 paper1["domain"],
                 paper2["domain"],
+                paper1["extractive"],
+                paper2["extractive"],
                 paper1["abstractive"],
                 paper2["abstractive"],
                 paper1["keywords"],
@@ -519,12 +521,15 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
+            st.markdown("### 📝 Extractive Summary (TextRank)")
+            st.write(result["Paper A"]["Extractive"])
+
             st.markdown("### ✨ Abstractive Summary (Gemini)")
 
-            if result["Paper A"]["Summary"]:
-                st.write(result["Paper A"]["Summary"])
+            if result["Paper A"]["Abstractive"]:
+                st.write(result["Paper A"]["Abstractive"])
             else:
-                st.warning("Gemini summary is temporarily unavailable.")
+                st.info("Gemini is temporarily unavailable. Showing the extractive summary instead.")
 
         with c2:
 
@@ -546,12 +551,15 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
+            st.markdown("### 📝 Extractive Summary (TextRank)")
+            st.write(result["Paper B"]["Extractive"])
+
             st.markdown("### ✨ Abstractive Summary (Gemini)")
 
-            if result["Paper B"]["Summary"]:
-                st.write(result["Paper B"]["Summary"])
+            if result["Paper B"]["Abstractive"]:
+                st.write(result["Paper B"]["Abstractive"])
             else:
-                st.warning("Gemini summary is temporarily unavailable.")
+                st.info("Gemini is temporarily unavailable. Showing the extractive summary instead.")
 
         st.markdown("---")
 
