@@ -1,41 +1,38 @@
 
 import nltk
-import string
-from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-# Download resources (runs only once)
-nltk.download("punkt")
-nltk.download("stopwords")
-nltk.download("wordnet")
+# Download required NLTK resources if missing
+required_resources = [
+    ("tokenizers/punkt", "punkt"),
+    ("tokenizers/punkt_tab", "punkt_tab"),
+    ("corpora/stopwords", "stopwords"),
+    ("corpora/wordnet", "wordnet"),
+    ("corpora/omw-1.4", "omw-1.4"),
+]
+
+for path, resource in required_resources:
+    try:
+        nltk.data.find(path)
+    except LookupError:
+        nltk.download(resource, quiet=True)
 
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words("english"))
 
 def preprocess_text(text):
-    """
-    Cleans the extracted text using NLP preprocessing.
-    Returns cleaned text and tokens.
-    """
-
-    # Lowercase
-    text = text.lower()
-
-    # Tokenization
     tokens = word_tokenize(text)
 
-    # Remove punctuation and stopwords
-    tokens = [
-        word for word in tokens
-        if word not in stop_words
-        and word not in string.punctuation
-        and word.isalpha()
-    ]
+    cleaned_tokens = []
 
-    # Lemmatization
-    tokens = [lemmatizer.lemmatize(word) for word in tokens]
+    for token in tokens:
+        token = token.lower()
 
-    cleaned_text = " ".join(tokens)
+        if token.isalpha() and token not in stop_words:
+            cleaned_tokens.append(lemmatizer.lemmatize(token))
 
-    return cleaned_text, tokens
+    cleaned_text = " ".join(cleaned_tokens)
+
+    return cleaned_text, cleaned_tokens
