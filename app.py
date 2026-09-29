@@ -268,43 +268,48 @@ if mode == "Single Paper":
     # PAPER PROFILE
     # -----------------------------------------------------
 
-    st.markdown(
+    st.html(
         f"""
-        <div class="glass-card">
+<div class="glass-card">
 
-        # {metadata["title"]}
+    <h1>{metadata["title"]}</h1>
 
-        **👤 Authors:** {metadata["authors"]}
+    <p>
+        <strong>👤 Authors:</strong> {metadata["authors"]}
+    </p>
 
-        **📅 Year:** {metadata["year"]}
+    <p>
+        <strong>📅 Year:</strong> {metadata["year"]}
+    </p>
 
-        <div style="margin-top:15px;">
+    <div style="margin-top:15px;">
 
         <span class="chip blue">{domain}</span>
 
         <span class="chip purple">
-        {confidence}% confidence
+            {confidence}% confidence
         </span>
 
         <span class="chip pink">
-        {stats["Reading Time"]} min read
+            {stats["Reading Time"]} min read
         </span>
 
         <span class="chip green">
-        {stats["Words"]} words
+            {stats["Words"]} words
         </span>
 
-        </div>
+    </div>
 
-        <hr>
+    <hr>
 
-        ### Abstract Preview
+    <h3>Abstract Preview</h3>
 
+    <p>
         {metadata["abstract"][:500]}...
+    </p>
 
-        </div>
-        """,
-        unsafe_allow_html=True
+</div>
+"""
     )
 
 
