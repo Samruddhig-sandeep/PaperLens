@@ -12,6 +12,7 @@ from domain_classifier import predict_domain
 from section_splitter import split_sections
 from paper_stats import get_stats
 from insights_generator import generate_insights
+from research_gap import generate_research_gap
 from comparison import compare_papers
 from styles import load_css
 
@@ -155,6 +156,7 @@ with st.sidebar:
         - 📚 Section Detection
         - 📊 Paper Statistics
         - 💡 Key Insights
+        - 🔎 Research Gap Analysis
         - 📑 Compare Two Papers
         - 💬 AI Paper Chatbot
         - 💾 Markdown Report
@@ -317,14 +319,15 @@ if mode == "Single Paper":
     # TABS
     # -----------------------------------------------------
 
-    overview, summary_tab, chat_tab, keyword_tab, section_tab, insight_tab = st.tabs(
+    overview, summary_tab, chat_tab, keyword_tab, section_tab, insight_tab, gap_tab = st.tabs(
         [
             "📊 Overview",
             "📝 Summary",
             "💬 Ask PaperLens",
             "🔑 Keywords",
             "📚 Sections",
-            "💡 Insights"
+            "💡 Insights",
+            "🔎 Research Gap"
         ]
     )
 
@@ -831,6 +834,70 @@ Rules:
 
 
     # =====================================================
+    # RESEARCH GAP ANALYSIS
+    # =====================================================
+
+    with gap_tab:
+
+        st.subheader("🔎 Potential Research Gap Analysis")
+
+        st.caption(
+            "PaperLens identifies potential gaps supported by the uploaded paper. "
+            "It does not claim that a gap is proven across the entire research literature."
+        )
+
+        st.info(
+            "For a stronger literature-based gap analysis, compare this paper with "
+            "related papers using the Compare Two Papers mode."
+        )
+
+        if "research_gap_result" not in st.session_state:
+            st.session_state.research_gap_result = None
+
+        if st.button(
+            "🔍 Analyze Potential Research Gaps",
+            key="analyze_research_gap"
+        ):
+
+            with st.spinner("Analyzing limitations, missing areas and future work..."):
+
+                st.session_state.research_gap_result = generate_research_gap(
+                    text=text,
+                    sections=sections,
+                    client=groq_client
+                )
+
+        if st.session_state.research_gap_result:
+
+            st.markdown(
+                f"""
+                <div class="glass-card">
+                <h3>🔎 Potential Research Gaps</h3>
+                <p>
+                These are potential gaps identified from the evidence available
+                in the uploaded paper.
+                </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.markdown(st.session_state.research_gap_result)
+
+            st.caption(
+                "Note: A research gap should be verified against related literature "
+                "before using it as a final research claim."
+            )
+
+        else:
+
+            st.write(
+                "Click the button above to analyze the paper for potential "
+                "research gaps, limitations and unexplored areas."
+            )
+
+
+    # =====================================================
     # DOWNLOAD REPORT
     # =====================================================
 
@@ -873,6 +940,15 @@ Rules:
 
         report += (
             f"- {finding}\n"
+        )
+
+    if st.session_state.get("research_gap_result"):
+
+        report += "\n---\n\n## Potential Research Gaps\n\n"
+        report += st.session_state.research_gap_result
+        report += (
+            "\n\n> Potential gaps should be verified against related literature "
+            "before being treated as established research gaps.\n"
         )
 
     st.download_button(
